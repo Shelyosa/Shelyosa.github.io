@@ -1,0 +1,26 @@
+:root {
+    color-scheme: light;
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: rgba(255, 255, 255, 0.04);
+    --surface-2: rgba(255, 255, 255, 0.06);
+    --line: rgba(255, 255, 255, 0.12);
+    --text-1: #f5efe8;
+    --accent: #fac58b;
+    --accent-soft: rgba(249, 220, 190, 0.16);
+    --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme="dark"] body {
+    background: #121212;
+    color: var(--text-1);
+}
+
+[data-theme="dark"] .post-entry,
+[data-theme="dark"] .toc-container,
+[data-theme="dark"] blockquote {
+    background: var(--surface-1);
+    border-color: var(--line);
+}

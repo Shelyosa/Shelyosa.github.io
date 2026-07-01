@@ -1,0 +1,20 @@
+.friend-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.friend-links a {
+    display: block;
+    padding: 1rem 1.05rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    text-decoration: none;
+    box-shadow: var(--shadow-soft);
+}
+
+.friend-links a:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}

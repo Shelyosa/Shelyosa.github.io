@@ -1,0 +1,23 @@
+.not-found {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.not-found h1 {
+    font-size: clamp(2.2rem, 4vw, 3rem);
+    margin-bottom: 0.8rem;
+}
+
+.not-found .button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.7rem 1.1rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+}
+
+.not-found .button:hover {
+    filter: brightness(1.05);
+}

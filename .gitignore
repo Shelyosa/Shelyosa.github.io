@@ -1,0 +1,5 @@
+# Hugo 忽略文件
+public/
+resources/
+.hugo_build.lock
+.DS_Store

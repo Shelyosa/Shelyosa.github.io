@@ -1,0 +1,71 @@
+# 站点基础配置
+baseURL = 'http://localhost:1313/'
+locale = 'zh-CN'
+title = '我的Hugo博客'
+theme = 'PaperMod'
+enableRobotsTXT = true
+hasCJKLanguage = true
+paginate = 6
+buildDrafts = false
+
+# 输出格式（搜索功能必需）
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+# 主题核心参数
+[params]
+  env = "production"
+  description = "一个用Hugo PaperMod搭建的个人博客"
+  keywords = ["Hugo", "PaperMod", "博客"]
+  author = "你的名字"
+  DateFormat = "2006-01-02"
+  
+  # 主题模式：auto自动/light浅色/dark深色
+  defaultTheme = "auto"
+  disableThemeToggle = false
+  
+  # 文章显示设置
+  ShowReadingTime = true
+  ShowWordCount = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowShareButtons = false
+  
+  # 文章目录
+  showToc = true
+  tocOpen = true
+  tocSide = "right"
+
+# 导航菜单
+[menu]
+  [[menu.main]]
+    identifier = "home"
+    name = "首页"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    identifier = "posts"
+    name = "文章"
+    url = "/posts/"
+    weight = 2
+  [[menu.main]]
+    identifier = "archives"
+    name = "归档"
+    url = "/archives/"
+    weight = 3
+  [[menu.main]]
+    identifier = "tags"
+    name = "标签"
+    url = "/tags/"
+    weight = 4
+  [[menu.main]]
+    identifier = "search"
+    name = "搜索"
+    url = "/search/"
+    weight = 5
+  [[menu.main]]
+    identifier = "about"
+    name = "关于"
+    url = "/about/"
+    weight = 6

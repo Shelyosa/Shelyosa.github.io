@@ -1,0 +1,66 @@
+:root {
+    --nav-width: 1380px;
+    --article-width: 650px;
+    --toc-width: 300px;
+}
+
+/* 目录容器固定在视口右侧 */
+.toc-container {
+    position: fixed;
+    /* 右侧距离：根据你的布局调整，下面两种方式选一种 */
+    /* 方式1：直接固定像素，适合简单布局 */
+    right: 20px;
+    /* 方式2：基于内容区计算，更精确（假设内容居中） */
+    /* right: calc((100% - var(--article-width)) / 2 - var(--toc-width) - var(--gap)); */
+
+    top: calc(var(--gap) * 3);
+    width: var(--toc-width);
+    max-height: calc(100vh - var(--gap) * 4); /* 限制高度，防止超出屏幕 */
+    overflow-y: auto;   /* 目录内容多时内部滚动 */
+    border: 1px solid var(--border);
+    /* background: var(--entry); 换成透明背景*/
+    background: transparent;
+    border-radius: var(--radius);
+    padding: 0.4em 0.8em;
+    z-index: 99;        /* 确保不被其他元素遮挡 */
+}
+
+/* 隐藏默认的折叠标题（保持目录始终展开） */
+.toc-container summary {
+    cursor: default;
+    padding: 8px 0;
+    font-weight: 500;
+    font-size: 1rem;
+    list-style: none;
+}
+
+.toc-container summary::-webkit-details-marker {
+    display: none;
+}
+
+/* 目录列表样式 */
+.toc-container #TableOfContents ul {
+    margin: 0;
+    padding-left: 1.2em;
+}
+
+.toc-container #TableOfContents li {
+    margin: 6px 0;
+    line-height: 1.4;
+}
+
+.toc-container #TableOfContents a {
+    text-decoration: none;
+    color: var(--primary);
+}
+
+.toc-container #TableOfContents a:hover {
+    color: var(--secondary);
+}
+
+/* 窄屏隐藏侧边目录 */
+@media screen and (max-width: 1440px) {
+    .toc-container {
+        display: none;
+    }
+}
