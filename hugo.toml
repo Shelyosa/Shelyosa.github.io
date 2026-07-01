@@ -1,5 +1,6 @@
 # 站点基础配置
-baseURL = 'http://localhost:1313/'
+# baseURL = 'http://localhost:1313/'，正式部署时需要修改
+baseURL = 'https://shelyosa.github.io/'
 locale = 'zh-CN'
 title = '我的Hugo博客'
 theme = 'PaperMod'
