@@ -50,8 +50,23 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
+body:not(.list) .header-nav {
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
 .main {
-    padding-top: var(--gap);
+    padding-top: calc(var(--gap) + 2.4rem);
+}
+
+body:not(.list) .main {
+    padding-top: calc(var(--gap) + 3.2rem);
+}
+
+body:not(.list) .post-single {
+    margin-top: 1rem;
 }
 
 .post-content p,
@@ -89,7 +104,11 @@ body {
     }
 
     .main {
-        padding-top: calc(var(--header-height) + var(--gap) * 0.5);
+        padding-top: calc(var(--gap) + 1.8rem);
+    }
+
+    body:not(.list) .main {
+        padding-top: calc(var(--gap) + 2.5rem);
     }
 }
 
