@@ -44,10 +44,10 @@ body {
     margin: 0 auto;
     padding: 0.7rem var(--gap);
     line-height: 1.2;
-    background: var(--surface-1);
-    border: 1px solid var(--line);
+    background: transparent;
+    border: 1px solid transparent;
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-soft);
+    box-shadow: none;
 }
 
 .main {
