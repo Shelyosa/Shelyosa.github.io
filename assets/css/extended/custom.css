@@ -13,7 +13,7 @@
     --radius-md: 12px;
     --radius-lg: 18px;
     /* --surface-1: rgb(255, 255, 255);纯白色，以下换成暖色调 */
-    --surface-1: rgb(255, 250, 240); /* 著名的 Alibaba Sans UI 体系常用的暖白底色 */
+    --surface-1: rgb(255, 252, 248); 
     --line: rgba(23, 19, 17, 0.08);
     --text-1: #201a16;
     --text-2: #c98557;
