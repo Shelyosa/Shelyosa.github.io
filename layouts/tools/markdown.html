@@ -1,0 +1,140 @@
+{{ define "main" }}
+<div class="md-editor-container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+
+    <h1 style="font-size: 28px; margin-bottom: 8px;">📝 Markdown 实时便签</h1>
+    <p style="color: #6b7280; margin-bottom: 20px;">左边写 Markdown，右边实时预览，内容自动保存在浏览器中</p>
+
+    <div style="display: flex; gap: 20px; height: 70vh; min-height: 400px;">
+        <!-- 左边：编辑器 -->
+        <div style="flex: 1; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: #6b7280;">
+                <span>📄 编辑器</span>
+                <span id="word-count">字数：0</span>
+            </div>
+            <textarea id="md-editor"
+                      style="flex: 1; padding: 16px; border-radius: 12px; border: 1px solid #d1d5db; font-family: 'Courier New', monospace; font-size: 15px; line-height: 1.6; resize: none; outline: none; background: #fafafa;"
+                      placeholder="在此输入 Markdown ...&#10;&#10;例如：&#10;# 标题&#10;- 列表项&#10;**加粗**"></textarea>
+        </div>
+
+        <!-- 右边：预览区 -->
+        <div style="flex: 1; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: #6b7280;">
+                <span>👀 预览</span>
+                <button id="clear-btn" style="background: none; border: 1px solid #ef4444; color: #ef4444; padding: 2px 12px; border-radius: 16px; cursor: pointer; font-size: 12px;">清空内容</button>
+            </div>
+            <div id="md-preview"
+                 style="flex: 1; padding: 16px; border-radius: 12px; border: 1px solid #d1d5db; background: #ffffff; overflow-y: auto; line-height: 1.8;">
+                <p style="color: #9ca3af;">✍️ 左边输入内容，这里会实时预览...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部小贴士 -->
+    <div style="margin-top: 12px; font-size: 13px; color: #9ca3af; text-align: center;">
+        💾 内容每 1 秒自动保存到浏览器本地，关闭页面再打开仍在
+    </div>
+</div>
+
+<!-- 1. 引入 marked.js CDN (用于将 Markdown 转为 HTML) -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<style>
+    /* 适配你的深色主题 (如果你的博客有 dark 类名，会自动适配) */
+    body.dark #md-editor {
+        background: #1f2937;
+        border-color: #374151;
+        color: #e5e7eb;
+    }
+    body.dark #md-preview {
+        background: #1f2937;
+        border-color: #374151;
+        color: #e5e7eb;
+    }
+    body.dark #md-preview h1, body.dark #md-preview h2 { color: #f3f4f6; }
+    body.dark #md-preview p { color: #d1d5db; }
+    body.dark #md-preview code { background: #111827; color: #fbbf24; }
+
+    /* 预览区内部 Markdown 样式微调 */
+    #md-preview h1 { font-size: 28px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+    #md-preview h2 { font-size: 22px; margin-top: 16px; }
+    #md-preview ul { padding-left: 24px; }
+    #md-preview code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+    #md-preview blockquote { border-left: 4px solid #3b82f6; padding-left: 16px; color: #6b7280; margin-left: 0; }
+    #md-preview a { color: #3b82f6; text-decoration: underline; }
+</style>
+
+<script>
+    (function() {
+        const editor = document.getElementById('md-editor');
+        const preview = document.getElementById('md-preview');
+        const wordCount = document.getElementById('word-count');
+        const clearBtn = document.getElementById('clear-btn');
+
+        // 存储 Key
+        const STORAGE_KEY = 'my_markdown_note';
+
+        // ---- 核心渲染函数 ----
+        function render() {
+            const rawText = editor.value;
+            // 使用 marked 解析 Markdown 为 HTML
+            const htmlContent = marked.parse(rawText);
+            preview.innerHTML = htmlContent;
+
+            // 统计字数（过滤掉空字符）
+            const chars = rawText.replace(/\s/g, '').length;
+            wordCount.textContent = `字数：${chars}`;
+        }
+
+        // ---- 保存到 localStorage ----
+        function saveToLocal() {
+            localStorage.setItem(STORAGE_KEY, editor.value);
+        }
+
+        // ---- 加载本地数据 ----
+        function loadFromLocal() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved !== null) {
+                editor.value = saved;
+            } else {
+                // 如果没有数据，给一段默认示例
+                editor.value = `# 欢迎使用 Markdown 便签本
+
+这是一个实时预览器。
+
+- 支持 **加粗** 和 *斜体*
+- 支持 [链接](https://example.com)
+- 支持代码块 \`console.log('hello')\`
+
+> 写点东西吧，它会自动保存！`;
+            }
+            render(); // 渲染初始内容
+        }
+
+        // ---- 清空功能 ----
+        clearBtn.addEventListener('click', function() {
+            if (confirm('确定要清空所有内容吗？（本地保存的也会被清除）')) {
+                editor.value = '';
+                saveToLocal();
+                render();
+                editor.focus();
+            }
+        });
+
+        // ---- 绑定事件 ----
+        // 输入时实时渲染 + 自动保存（利用防抖，但这里简单写，直接保存）
+        editor.addEventListener('input', function() {
+            render();
+            saveToLocal();
+        });
+
+        // ---- 页面初始化 ----
+        loadFromLocal();
+
+        // 当页面关闭前，再保存一次（保险）
+        window.addEventListener('beforeunload', function() {
+            saveToLocal();
+        });
+
+    })();
+</script>
+{{ end }}
