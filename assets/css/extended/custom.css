@@ -12,40 +12,42 @@
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 18px;
-    --surface-1: rgba(252, 250, 247, 0.92);
-    --surface-2: #f7efe6;
+    /* --surface-1: rgb(255, 255, 255);纯白色，以下换成暖色调 */
+    --surface-1: rgb(255, 252, 248); 
     --line: rgba(23, 19, 17, 0.08);
     --text-1: #201a16;
-    --text-2: #6f635b;
-    --accent: #8b6b4f;
+    --text-2: #c98557;
+    --accent: #b8773f;
     --accent-soft: rgba(139, 107, 79, 0.12);
     --shadow-soft: 0 10px 28px rgba(32, 26, 22, 0.06);
     --header-height: 64px;
 }
 
 body {
-    background: linear-gradient(180deg, #fcfaf7 0%, #f7efe6 100%);
+    background: #fffcfa;
     color: var(--text-1);
 }
 
-.header-nav {
+.header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 9999;
-    height: var(--header-height);
-    padding: 0 var(--gap, 24px);
-    display: flex;
-    align-items: center;
-    
-    /* 背景完全透明，不加任何 backdrop-filter */
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    
-    /* 底部一条极细的阴影作为边界线 */
-    box-shadow: 0 1px 0 0 rgba(23, 19, 17, 0.08);
+    padding: 0.8rem 0;
+}
+
+.header-nav {
+    position: relative;
+    max-width: calc(var(--nav-width) + var(--gap) * 2);
+    width: min(100%, calc(var(--nav-width) + var(--gap) * 2));
+    margin: 0 auto;
+    padding: 0.7rem var(--gap);
+    line-height: 1.2;
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
 }
 
 body:not(.list) .header-nav {
