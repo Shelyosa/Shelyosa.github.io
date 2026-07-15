@@ -1,140 +1,598 @@
 {{ define "main" }}
-<div class="md-editor-container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+<div class="md-editor-wrap">
 
-    <h1 style="font-size: 28px; margin-bottom: 8px;">📝 Markdown 实时便签</h1>
-    <p style="color: #6b7280; margin-bottom: 20px;">左边写 Markdown，右边实时预览，内容自动保存在浏览器中</p>
+  <!-- 顶部工具栏 -->
+  <div class="md-toolbar">
+    <div class="md-toolbar-left">
+      <span class="md-toolbar-icon">✏️</span>
+      <span class="md-toolbar-title">Markdown 编辑器</span>
+    </div>
+    <div class="md-toolbar-right">
+      <button id="clear-btn" class="md-btn md-btn-danger" title="清空内容">🗑️ 清空</button>
+    </div>
+  </div>
 
-    <div style="display: flex; gap: 20px; height: 70vh; min-height: 400px;">
-        <!-- 左边：编辑器 -->
-        <div style="flex: 1; display: flex; flex-direction: column;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: #6b7280;">
-                <span>📄 编辑器</span>
-                <span id="word-count">字数：0</span>
-            </div>
-            <textarea id="md-editor"
-                      style="flex: 1; padding: 16px; border-radius: 12px; border: 1px solid #d1d5db; font-family: 'Courier New', monospace; font-size: 15px; line-height: 1.6; resize: none; outline: none; background: #fafafa;"
-                      placeholder="在此输入 Markdown ...&#10;&#10;例如：&#10;# 标题&#10;- 列表项&#10;**加粗**"></textarea>
-        </div>
-
-        <!-- 右边：预览区 -->
-        <div style="flex: 1; display: flex; flex-direction: column;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: #6b7280;">
-                <span>👀 预览</span>
-                <button id="clear-btn" style="background: none; border: 1px solid #ef4444; color: #ef4444; padding: 2px 12px; border-radius: 16px; cursor: pointer; font-size: 12px;">清空内容</button>
-            </div>
-            <div id="md-preview"
-                 style="flex: 1; padding: 16px; border-radius: 12px; border: 1px solid #d1d5db; background: #ffffff; overflow-y: auto; line-height: 1.8;">
-                <p style="color: #9ca3af;">✍️ 左边输入内容，这里会实时预览...</p>
-            </div>
-        </div>
+  <!-- 主体：编辑器 + 预览 -->
+  <div class="md-body">
+    <div class="md-pane md-pane-editor">
+      <div class="md-pane-header">
+        <span class="md-pane-label">📝 编辑区</span>
+        <span class="md-pane-hint">支持 Markdown 语法</span>
+      </div>
+      <textarea id="md-editor" class="md-editor-area" spellcheck="false" placeholder="在此输入 Markdown ...&#10;&#10;例如：&#10;# 标题&#10;- 列表项&#10;**加粗**"></textarea>
     </div>
 
-    <!-- 底部小贴士 -->
-    <div style="margin-top: 12px; font-size: 13px; color: #9ca3af; text-align: center;">
-        💾 内容每 1 秒自动保存到浏览器本地，关闭页面再打开仍在
+    <div class="md-divider"></div>
+
+    <div class="md-pane md-pane-preview">
+      <div class="md-pane-header">
+        <span class="md-pane-label">👁️ 预览区</span>
+        <span class="md-pane-hint">实时渲染效果</span>
+      </div>
+      <div id="md-preview" class="md-preview-area">
+        <p class="md-placeholder">✍️ 左侧输入内容，这里将实时预览渲染效果...</p>
+      </div>
     </div>
+  </div>
+
+  <!-- 底部状态栏 -->
+  <div class="md-statusbar">
+    <div class="md-status-item">
+      <span id="word-count">0</span> 字
+    </div>
+    <div class="md-status-item">
+      <span id="line-count">0</span> 行
+    </div>
+    <div class="md-status-item md-status-save" id="save-status">💾 已自动保存</div>
+  </div>
+
 </div>
 
-<!-- 1. 引入 marked.js CDN (用于将 Markdown 转为 HTML) -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  (function() {
+    const editor = document.getElementById('md-editor');
+    const preview = document.getElementById('md-preview');
+    const wordCount = document.getElementById('word-count');
+    const lineCount = document.getElementById('line-count');
+    const clearBtn = document.getElementById('clear-btn');
+    const saveStatus = document.getElementById('save-status');
+
+    const STORAGE_KEY = 'my_markdown_note';
+
+    // ---- 渲染 ----
+    function render() {
+      const raw = editor.value;
+      const html = marked.parse(raw);
+      preview.innerHTML = html;
+      wordCount.textContent = raw.replace(/\s/g, '').length;
+      lineCount.textContent = raw ? raw.split('\n').length : 0;
+    }
+
+    // ---- 存储 ----
+    function save() {
+      localStorage.setItem(STORAGE_KEY, editor.value);
+      saveStatus.textContent = '💾 已自动保存';
+      saveStatus.classList.remove('md-status-save-warn');
+    }
+
+    // ---- 防抖 ----
+    let saveTimer;
+    function debouncedSave() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(save, 800);
+    }
+
+    // ---- 加载 ----
+    function load() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved !== null) {
+        editor.value = saved;
+      } else {
+        editor.value = `# 欢迎使用 Markdown 编辑器 📝
+
+这是一个实时预览的 Markdown 便签本。
+
+## 功能特性
+
+- **实时预览** — 左侧编辑，右侧即时渲染
+- **自动保存** — 内容自动保存在浏览器本地
+- **字数统计** — 底部状态栏实时显示字数和行数
+
+## 语法示例
+
+### 列表
+1. 有序列表项
+2. 有序列表项
+
+- 无序列表项
+- 无序列表项
+
+### 代码
+
+行内代码：\`const a = 1;\`
+
+代码块：
+
+\`\`\`javascript
+function hello() {
+  console.log('Hello, world!');
+}
+\`\`\`
+
+### 引用
+
+> 这是引用块样式
+
+### 链接和图片
+
+[访问 GitHub](https://github.com)
+
+---
+
+写点内容试试吧，它会自动保存！`;
+      }
+      render();
+    }
+
+    // ---- 清空 ----
+    clearBtn.addEventListener('click', function() {
+      if (confirm('确定要清空所有内容吗？')) {
+        editor.value = '';
+        save();
+        render();
+        editor.focus();
+      }
+    });
+
+    // ---- 输入事件 ----
+    editor.addEventListener('input', function() {
+      render();
+      saveStatus.textContent = '⏳ 保存中...';
+      saveStatus.classList.add('md-status-save-warn');
+      debouncedSave();
+    });
+
+    // ---- 快捷键 Ctrl+S ----
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        save();
+        saveStatus.textContent = '✅ 已保存';
+        setTimeout(function() {
+          saveStatus.textContent = '💾 已自动保存';
+        }, 2000);
+      }
+    });
+
+    // ---- 初始化 ----
+    load();
+
+    window.addEventListener('beforeunload', save);
+  })();
+</script>
 
 <style>
-    /* 适配你的深色主题 (如果你的博客有 dark 类名，会自动适配) */
-    body.dark #md-editor {
-        background: #1f2937;
-        border-color: #374151;
-        color: #e5e7eb;
-    }
-    body.dark #md-preview {
-        background: #1f2937;
-        border-color: #374151;
-        color: #e5e7eb;
-    }
-    body.dark #md-preview h1, body.dark #md-preview h2 { color: #f3f4f6; }
-    body.dark #md-preview p { color: #d1d5db; }
-    body.dark #md-preview code { background: #111827; color: #fbbf24; }
+/* ===== 整体容器 ===== */
+.md-editor-wrap {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+}
 
-    /* 预览区内部 Markdown 样式微调 */
-    #md-preview h1 { font-size: 28px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
-    #md-preview h2 { font-size: 22px; margin-top: 16px; }
-    #md-preview ul { padding-left: 24px; }
-    #md-preview code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
-    #md-preview blockquote { border-left: 4px solid #3b82f6; padding-left: 16px; color: #6b7280; margin-left: 0; }
-    #md-preview a { color: #3b82f6; text-decoration: underline; }
+/* ===== 工具栏 ===== */
+.md-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--md-toolbar-bg, #fff);
+  border: 1px solid var(--md-border, #e4e6eb);
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+}
+.md-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.md-toolbar-icon {
+  font-size: 20px;
+}
+.md-toolbar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--md-text, #1d2129);
+}
+.md-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== 按钮 ===== */
+.md-btn {
+  padding: 6px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fff;
+  color: #515767;
+  transition: all 0.2s;
+}
+.md-btn:hover {
+  border-color: #1e80ff;
+  color: #1e80ff;
+}
+.md-btn-danger {
+  color: #f04142;
+  border-color: #fcd1d1;
+  background: #fff5f5;
+}
+.md-btn-danger:hover {
+  background: #fef0f0;
+  border-color: #f04142;
+  color: #f04142;
+}
+
+/* ===== 主体区域 ===== */
+.md-body {
+  display: flex;
+  border: 1px solid var(--md-border, #e4e6eb);
+  border-radius: 0 0 12px 12px;
+  background: var(--md-body-bg, #fff);
+  min-height: 500px;
+  height: calc(100vh - 320px);
+}
+.md-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+.md-pane-editor {
+  border-right: 1px solid var(--md-border, #e4e6eb);
+}
+
+/* ===== 面板头部 ===== */
+.md-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--md-pane-header-bg, #f7f8fa);
+  border-bottom: 1px solid var(--md-border, #e4e6eb);
+}
+.md-pane-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--md-text, #1d2129);
+}
+.md-pane-hint {
+  font-size: 12px;
+  color: #8a919f;
+}
+
+/* ===== 编辑器 ===== */
+.md-editor-area {
+  flex: 1;
+  padding: 16px 20px;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: "SF Mono", "Fira Code", "Consolas", "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.8;
+  background: var(--md-editor-bg, #fafbfc);
+  color: var(--md-text, #1d2129);
+  tab-size: 2;
+}
+.md-editor-area::placeholder {
+  color: #c0c4cc;
+}
+
+/* ===== 预览区 ===== */
+.md-preview-area {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+  background: var(--md-preview-bg, #fff);
+  color: var(--md-text, #1d2129);
+  line-height: 1.8;
+  font-size: 15px;
+}
+.md-placeholder {
+  color: #c0c4cc;
+  text-align: center;
+  margin-top: 80px;
+  font-size: 14px;
+}
+
+/* ===== 预览区内容样式 (CSDN 风格) ===== */
+#md-preview h1 {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 20px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e4e6eb;
+  color: var(--md-text, #1d2129);
+}
+#md-preview h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 18px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eef0f4;
+  color: var(--md-text, #1d2129);
+}
+#md-preview h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+  color: var(--md-text, #1d2129);
+}
+#md-preview h4, #md-preview h5, #md-preview h6 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 14px 0 6px;
+  color: var(--md-text, #1d2129);
+}
+#md-preview p {
+  margin: 8px 0;
+  color: var(--md-text-secondary, #515767);
+}
+#md-preview strong {
+  font-weight: 700;
+  color: var(--md-text, #1d2129);
+}
+#md-preview a {
+  color: #1e80ff;
+  text-decoration: none;
+}
+#md-preview a:hover {
+  text-decoration: underline;
+}
+#md-preview ul, #md-preview ol {
+  padding-left: 24px;
+  margin: 8px 0;
+}
+#md-preview li {
+  margin: 4px 0;
+  color: var(--md-text-secondary, #515767);
+}
+#md-preview blockquote {
+  margin: 12px 0;
+  padding: 12px 16px;
+  background: var(--md-blockquote-bg, #f7f8fa);
+  border-left: 4px solid #1e80ff;
+  border-radius: 0 6px 6px 0;
+  color: var(--md-text-secondary, #515767);
+}
+#md-preview blockquote p {
+  margin: 4px 0;
+  color: inherit;
+}
+#md-preview code {
+  padding: 2px 6px;
+  background: #f2f3f5;
+  border-radius: 4px;
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 13px;
+  color: #c7254e;
+}
+#md-preview pre {
+  margin: 12px 0;
+  padding: 14px 16px;
+  background: #f6f8fa;
+  border-radius: 8px;
+  border: 1px solid #eef0f4;
+  overflow-x: auto;
+}
+#md-preview pre code {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+}
+#md-preview img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+#md-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+}
+#md-preview th, #md-preview td {
+  padding: 8px 12px;
+  border: 1px solid #e4e6eb;
+  text-align: left;
+}
+#md-preview th {
+  background: #f7f8fa;
+  font-weight: 600;
+}
+#md-preview hr {
+  border: none;
+  border-top: 1px solid #e4e6eb;
+  margin: 20px 0;
+}
+#md-preview task-list-item {
+  list-style: none;
+}
+
+/* ===== 分割线 ===== */
+.md-divider {
+  display: none;
+}
+
+/* ===== 状态栏 ===== */
+.md-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 20px;
+  background: var(--md-toolbar-bg, #fff);
+  border: 1px solid var(--md-border, #e4e6eb);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  font-size: 12px;
+  color: #8a919f;
+}
+.md-status-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.md-status-item span {
+  font-weight: 600;
+  color: var(--md-text, #1d2129);
+}
+.md-status-save {
+  margin-left: auto;
+  color: #00a854;
+}
+.md-status-save-warn {
+  color: #faad14 !important;
+}
+
+/* ===== 深色主题适配 ===== */
+[data-theme="dark"] {
+  --md-border: #3a3f4b;
+  --md-text: #e5e7eb;
+  --md-text-secondary: #c0c4cc;
+  --md-toolbar-bg: #262a35;
+  --md-body-bg: #1f232e;
+  --md-editor-bg: #1b1f29;
+  --md-preview-bg: #1f232e;
+  --md-pane-header-bg: #262a35;
+  --md-blockquote-bg: #2a2e3a;
+}
+
+body.dark {
+  --md-border: #3a3f4b;
+  --md-text: #e5e7eb;
+  --md-text-secondary: #c0c4cc;
+  --md-toolbar-bg: #262a35;
+  --md-body-bg: #1f232e;
+  --md-editor-bg: #1b1f29;
+  --md-preview-bg: #1f232e;
+  --md-pane-header-bg: #262a35;
+  --md-blockquote-bg: #2a2e3a;
+}
+
+body.dark .md-toolbar,
+body.dark .md-statusbar {
+  border-color: #3a3f4b;
+}
+body.dark .md-btn {
+  background: #2a2e3a;
+  border-color: #3a3f4b;
+  color: #c0c4cc;
+}
+body.dark .md-btn-danger {
+  background: #2a1f1f;
+  border-color: #5c3030;
+  color: #f87171;
+}
+body.dark .md-btn-danger:hover {
+  background: #3a2525;
+  border-color: #f87171;
+}
+body.dark .md-body {
+  border-color: #3a3f4b;
+}
+body.dark .md-pane-editor {
+  border-color: #3a3f4b;
+}
+body.dark .md-pane-header {
+  background: #262a35;
+  border-color: #3a3f4b;
+}
+body.dark .md-editor-area {
+  background: #1b1f29;
+  color: #e5e7eb;
+}
+body.dark .md-preview-area {
+  background: #1f232e;
+  color: #e5e7eb;
+}
+body.dark #md-preview h1,
+body.dark #md-preview h2 {
+  border-bottom-color: #3a3f4b;
+  color: #e5e7eb;
+}
+body.dark #md-preview h3,
+body.dark #md-preview h4,
+body.dark #md-preview strong {
+  color: #e5e7eb;
+}
+body.dark #md-preview p,
+body.dark #md-preview li {
+  color: #c0c4cc;
+}
+body.dark #md-preview code {
+  background: #2a2e3a;
+  color: #fbbf24;
+}
+body.dark #md-preview pre {
+  background: #151923;
+  border-color: #3a3f4b;
+}
+body.dark #md-preview pre code {
+  color: #e5e7eb;
+}
+body.dark #md-preview blockquote {
+  background: #2a2e3a;
+  color: #c0c4cc;
+}
+body.dark #md-preview th {
+  background: #262a35;
+}
+body.dark #md-preview th,
+body.dark #md-preview td {
+  border-color: #3a3f4b;
+}
+body.dark #md-preview hr {
+  border-color: #3a3f4b;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+  .md-body {
+    flex-direction: column;
+    height: auto;
+  }
+  .md-pane {
+    width: 100%;
+    min-height: 300px;
+  }
+  .md-pane-editor {
+    border-right: none;
+    border-bottom: 1px solid var(--md-border, #e4e6eb);
+  }
+  .md-editor-area {
+    min-height: 250px;
+  }
+  .md-preview-area {
+    min-height: 300px;
+  }
+  .md-toolbar {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .md-statusbar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
 </style>
-
-<script>
-    (function() {
-        const editor = document.getElementById('md-editor');
-        const preview = document.getElementById('md-preview');
-        const wordCount = document.getElementById('word-count');
-        const clearBtn = document.getElementById('clear-btn');
-
-        // 存储 Key
-        const STORAGE_KEY = 'my_markdown_note';
-
-        // ---- 核心渲染函数 ----
-        function render() {
-            const rawText = editor.value;
-            // 使用 marked 解析 Markdown 为 HTML
-            const htmlContent = marked.parse(rawText);
-            preview.innerHTML = htmlContent;
-
-            // 统计字数（过滤掉空字符）
-            const chars = rawText.replace(/\s/g, '').length;
-            wordCount.textContent = `字数：${chars}`;
-        }
-
-        // ---- 保存到 localStorage ----
-        function saveToLocal() {
-            localStorage.setItem(STORAGE_KEY, editor.value);
-        }
-
-        // ---- 加载本地数据 ----
-        function loadFromLocal() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved !== null) {
-                editor.value = saved;
-            } else {
-                // 如果没有数据，给一段默认示例
-                editor.value = `# 欢迎使用 Markdown 便签本
-
-这是一个实时预览器。
-
-- 支持 **加粗** 和 *斜体*
-- 支持 [链接](https://example.com)
-- 支持代码块 \`console.log('hello')\`
-
-> 写点东西吧，它会自动保存！`;
-            }
-            render(); // 渲染初始内容
-        }
-
-        // ---- 清空功能 ----
-        clearBtn.addEventListener('click', function() {
-            if (confirm('确定要清空所有内容吗？（本地保存的也会被清除）')) {
-                editor.value = '';
-                saveToLocal();
-                render();
-                editor.focus();
-            }
-        });
-
-        // ---- 绑定事件 ----
-        // 输入时实时渲染 + 自动保存（利用防抖，但这里简单写，直接保存）
-        editor.addEventListener('input', function() {
-            render();
-            saveToLocal();
-        });
-
-        // ---- 页面初始化 ----
-        loadFromLocal();
-
-        // 当页面关闭前，再保存一次（保险）
-        window.addEventListener('beforeunload', function() {
-            saveToLocal();
-        });
-
-    })();
-</script>
 {{ end }}
