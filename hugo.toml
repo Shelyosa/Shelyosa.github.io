@@ -18,7 +18,7 @@ buildDrafts = false
   env = "production"
   description = "一个用Hugo PaperMod搭建的个人博客"
   keywords = ["Hugo", "PaperMod", "博客"]
-  author = "你的名字"
+  author = "请叫我实战派"
   DateFormat = "2006-01-02"
   
   # 主题模式：auto自动/light浅色/dark深色
