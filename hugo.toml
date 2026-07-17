@@ -71,7 +71,12 @@ buildDrafts = false
     url = "/tools/markdown/"
     weight = 6
   [[menu.main]]
+    identifier = "todo"
+    name = "待办"
+    url = "/tools/todo/"
+    weight = 7
+  [[menu.main]]
     identifier = "about"
     name = "关于"
     url = "/about/"
-    weight = 7
+    weight = 8
