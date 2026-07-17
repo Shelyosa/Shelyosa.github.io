@@ -49,6 +49,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css" id="hljs-theme">
 <script>
   (function() {
     const editor = document.getElementById('md-editor');
@@ -60,26 +62,25 @@
 
     const STORAGE_KEY = 'my_markdown_note';
 
-    // ---- 渲染（对代码块做语法高亮处理）----
+    // ---- 渲染（使用 highlight.js 语法高亮）----
     function render() {
       const raw = editor.value;
-      let html = marked.parse(raw, { gfm: true });
-
-      // 为代码块添加 hljs class 标记，便于 CSS 着色
-      html = html.replace(
-        /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
-        function(match, lang, code) {
-          return '<pre><code class="language-' + lang + ' hljs">' + code + '</code></pre>';
+      preview.innerHTML = marked.parse(raw, {
+        gfm: true,
+        breaks: true,
+        highlight: function(code, lang) {
+          if (lang && hljs.getLanguage(lang)) {
+            try {
+              return hljs.highlight(code, { language: lang }).value;
+            } catch (e) {}
+          }
+          // 未指定语言或识别失败，自动检测
+          try {
+            return hljs.highlightAuto(code).value;
+          } catch (e) {}
+          return code;
         }
-      );
-      html = html.replace(
-        /<pre><code>([\s\S]*?)<\/code><\/pre>/g,
-        function(match, code) {
-          return '<pre><code class="hljs">' + code + '</code></pre>';
-        }
-      );
-
-      preview.innerHTML = html;
+      });
       wordCount.textContent = raw.replace(/\s/g, '').length;
       lineCount.textContent = raw ? raw.split('\n').length : 0;
     }
@@ -179,6 +180,29 @@ function hello() {
         }, 2000);
       }
     });
+
+    // ---- 切换 highlight.js 主题 ----
+    function setHighlightTheme(dark) {
+      const link = document.getElementById('hljs-theme');
+      if (link) {
+        link.href = dark
+          ? 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css'
+          : 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css';
+      }
+    }
+    // 监听主题变化
+    const themeObserver = new MutationObserver(function() {
+      const isDark = document.documentElement.dataset.theme === 'dark' ||
+                     document.body.classList.contains('dark');
+      setHighlightTheme(isDark);
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    // 初始设置
+    setHighlightTheme(
+      document.documentElement.dataset.theme === 'dark' ||
+      document.body.classList.contains('dark')
+    );
 
     // ---- 初始化 ----
     load();
@@ -406,19 +430,23 @@ function hello() {
 }
 #md-preview pre {
   margin: 16px 0;
-  padding: 16px 20px; /* 代码块内边距增加 */
+  padding: 16px 0;
   background: #f6f8fa;
   border-radius: 8px;
   border: 1px solid #eef0f4;
   overflow-x: auto;
 }
 #md-preview pre code {
-  padding: 0;
+  padding: 0 20px;
   background: none;
   border-radius: 0;
   color: inherit;
-  font-size: 14px;    /* 代码块字体稍微增大 */
-  line-height: 1.8;   /* 代码块行高增加 */
+  font-size: 14px;
+  line-height: 1.8;
+}
+/* highlight.js 代码块样式微调 */
+#md-preview pre code.hljs {
+  padding: 0 20px !important;
 }
 #md-preview img {
   max-width: 100%;
@@ -570,38 +598,12 @@ body.dark #md-preview code {
   color: #fbbf24;
 }
 body.dark #md-preview pre {
-  background: #181c2a;
-  border-color: #3a3f6b;
-  box-shadow: 0 0 0 1px rgba(100, 120, 255, 0.08);
+  background: #161b22;
+  border-color: #30363d;
 }
 body.dark #md-preview pre code {
-  color: #e2e8f0;
-}
-body.dark #md-preview pre code .hljs-keyword,
-body.dark #md-preview pre code .hljs-selector-tag,
-body.dark #md-preview pre code .hljs-title,
-body.dark #md-preview pre code .hljs-section,
-body.dark #md-preview pre code .hljs-doctag,
-body.dark #md-preview pre code .hljs-meta-keyword {
-  color: #93c5fd;
-}
-body.dark #md-preview pre code .hljs-string,
-body.dark #md-preview pre code .hljs-attr {
-  color: #a5d6a7;
-}
-body.dark #md-preview pre code .hljs-number,
-body.dark #md-preview pre code .hljs-literal {
-  color: #f9a825;
-}
-body.dark #md-preview pre code .hljs-comment {
-  color: #6b7280;
-  font-style: italic;
-}
-body.dark #md-preview pre code .hljs-built_in {
-  color: #90caf9;
-}
-body.dark #md-preview pre code .hljs-params {
-  color: #e2e8f0;
+  background: transparent;
+  color: #e6edf3;
 }
 body.dark #md-preview blockquote {
   background: #2a2e3a;
