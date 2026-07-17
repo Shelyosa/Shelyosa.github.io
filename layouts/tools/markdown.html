@@ -60,10 +60,25 @@
 
     const STORAGE_KEY = 'my_markdown_note';
 
-    // ---- 渲染 ----
+    // ---- 渲染（对代码块做语法高亮处理）----
     function render() {
       const raw = editor.value;
-      const html = marked.parse(raw);
+      let html = marked.parse(raw, { gfm: true });
+
+      // 为代码块添加 hljs class 标记，便于 CSS 着色
+      html = html.replace(
+        /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
+        function(match, lang, code) {
+          return '<pre><code class="language-' + lang + ' hljs">' + code + '</code></pre>';
+        }
+      );
+      html = html.replace(
+        /<pre><code>([\s\S]*?)<\/code><\/pre>/g,
+        function(match, code) {
+          return '<pre><code class="hljs">' + code + '</code></pre>';
+        }
+      );
+
       preview.innerHTML = html;
       wordCount.textContent = raw.replace(/\s/g, '').length;
       lineCount.textContent = raw ? raw.split('\n').length : 0;
@@ -551,15 +566,42 @@ body.dark #md-preview li {
   color: #c0c4cc;
 }
 body.dark #md-preview code {
-  background: #2a2e3a;
+  background: #2d3140;
   color: #fbbf24;
 }
 body.dark #md-preview pre {
-  background: #151923;
-  border-color: #3a3f4b;
+  background: #181c2a;
+  border-color: #3a3f6b;
+  box-shadow: 0 0 0 1px rgba(100, 120, 255, 0.08);
 }
 body.dark #md-preview pre code {
-  color: #e5e7eb;
+  color: #e2e8f0;
+}
+body.dark #md-preview pre code .hljs-keyword,
+body.dark #md-preview pre code .hljs-selector-tag,
+body.dark #md-preview pre code .hljs-title,
+body.dark #md-preview pre code .hljs-section,
+body.dark #md-preview pre code .hljs-doctag,
+body.dark #md-preview pre code .hljs-meta-keyword {
+  color: #93c5fd;
+}
+body.dark #md-preview pre code .hljs-string,
+body.dark #md-preview pre code .hljs-attr {
+  color: #a5d6a7;
+}
+body.dark #md-preview pre code .hljs-number,
+body.dark #md-preview pre code .hljs-literal {
+  color: #f9a825;
+}
+body.dark #md-preview pre code .hljs-comment {
+  color: #6b7280;
+  font-style: italic;
+}
+body.dark #md-preview pre code .hljs-built_in {
+  color: #90caf9;
+}
+body.dark #md-preview pre code .hljs-params {
+  color: #e2e8f0;
 }
 body.dark #md-preview blockquote {
   background: #2a2e3a;
