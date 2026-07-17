@@ -173,12 +173,16 @@ function hello() {
 </script>
 
 <style>
-/* ===== 整体容器 ===== */
+/* ===== 整体容器：参考 CSDN 撑满屏幕 ===== */
 .md-editor-wrap {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 0 16px;
+  max-width: 1600px; /* 增加最大宽度，让内容区更宽敞 */
+  margin: 0 auto;    /* 去掉上下 margin，让工具栏和状态栏贴边 */
+  padding: 0 24px;   /* 左右留出适当边距 */
+  height: 100vh;     /* 撑满整个视口高度 */
+  display: flex;
+  flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+  background: var(--md-body-bg, #fff);
 }
 
 /* ===== 工具栏 ===== */
@@ -186,11 +190,10 @@ function hello() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 12px 24px;
   background: var(--md-toolbar-bg, #fff);
-  border: 1px solid var(--md-border, #e4e6eb);
-  border-radius: 12px 12px 0 0;
-  border-bottom: none;
+  border-bottom: 1px solid var(--md-border, #e4e6eb);
+  flex-shrink: 0; /* 防止被压缩 */
 }
 .md-toolbar-left {
   display: flex;
@@ -238,20 +241,21 @@ function hello() {
   color: #f04142;
 }
 
-/* ===== 主体区域 ===== */
+/* ===== 主体区域：自适应填满剩余高度 ===== */
 .md-body {
   display: flex;
-  border: 1px solid var(--md-border, #e4e6eb);
-  border-radius: 0 0 12px 12px;
+  flex: 1;           /* 占据工具栏和状态栏之外的剩余空间 */
   background: var(--md-body-bg, #fff);
-  min-height: 500px;
-  height: calc(100vh - 320px);
+  overflow: hidden;   /* 防止整体滚动，由内部编辑区和预览区自行滚动 */
+  border-left: 1px solid var(--md-border, #e4e6eb);
+  border-right: 1px solid var(--md-border, #e4e6eb);
 }
 .md-pane {
   flex: 1;
   display: flex;
   flex-direction: column;
   width: 50%;
+  min-width: 0;      /* 防止 flex 子项溢出 */
 }
 .md-pane-editor {
   border-right: 1px solid var(--md-border, #e4e6eb);
@@ -262,9 +266,10 @@ function hello() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: 10px 20px;
   background: var(--md-pane-header-bg, #f7f8fa);
   border-bottom: 1px solid var(--md-border, #e4e6eb);
+  flex-shrink: 0;
 }
 .md-pane-label {
   font-size: 13px;
@@ -276,32 +281,33 @@ function hello() {
   color: #8a919f;
 }
 
-/* ===== 编辑器 ===== */
+/* ===== 编辑器：增大字体和行高 ===== */
 .md-editor-area {
   flex: 1;
-  padding: 16px 20px;
+  padding: 20px 24px; /* 增大内边距 */
   border: none;
   outline: none;
   resize: none;
   font-family: "SF Mono", "Fira Code", "Consolas", "Courier New", monospace;
-  font-size: 14px;
-  line-height: 1.8;
+  font-size: 15px;    /* 字体从 14px 增加到 15px */
+  line-height: 2;     /* 行高从 1.8 增加到 2，更舒适 */
   background: var(--md-editor-bg, #fafbfc);
   color: var(--md-text, #1d2129);
   tab-size: 2;
+  overflow-y: auto;   /* 内容超出时独立滚动 */
 }
 .md-editor-area::placeholder {
   color: #c0c4cc;
 }
 
-/* ===== 预览区 ===== */
+/* ===== 预览区：CSDN 风格的宽敞排版 ===== */
 .md-preview-area {
   flex: 1;
-  padding: 16px 20px;
+  padding: 20px 32px; /* 增大内边距，左右留白更多 */
   overflow-y: auto;
   background: var(--md-preview-bg, #fff);
   color: var(--md-text, #1d2129);
-  line-height: 1.8;
+  line-height: 2;     /* 行高增大 */
   font-size: 15px;
 }
 .md-placeholder {
@@ -311,37 +317,37 @@ function hello() {
   font-size: 14px;
 }
 
-/* ===== 预览区内容样式 (CSDN 风格) ===== */
+/* ===== 预览区内容样式 (CSDN 风格优化) ===== */
 #md-preview h1 {
-  font-size: 26px;
+  font-size: 28px;    /* 标题更大 */
   font-weight: 700;
-  margin: 20px 0 12px;
-  padding-bottom: 8px;
+  margin: 24px 0 16px;
+  padding-bottom: 10px;
   border-bottom: 2px solid #e4e6eb;
   color: var(--md-text, #1d2129);
 }
 #md-preview h2 {
-  font-size: 20px;
+  font-size: 22px;    /* 标题更大 */
   font-weight: 600;
-  margin: 18px 0 10px;
-  padding-bottom: 6px;
+  margin: 22px 0 14px;
+  padding-bottom: 8px;
   border-bottom: 1px solid #eef0f4;
   color: var(--md-text, #1d2129);
 }
 #md-preview h3 {
-  font-size: 17px;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 20px 0 10px;
+  color: var(--md-text, #1d2129);
+}
+#md-preview h4, #md-preview h5, #md-preview h6 {
+  font-size: 16px;
   font-weight: 600;
   margin: 16px 0 8px;
   color: var(--md-text, #1d2129);
 }
-#md-preview h4, #md-preview h5, #md-preview h6 {
-  font-size: 15px;
-  font-weight: 600;
-  margin: 14px 0 6px;
-  color: var(--md-text, #1d2129);
-}
 #md-preview p {
-  margin: 8px 0;
+  margin: 12px 0;     /* 段落间距增大 */
   color: var(--md-text-secondary, #515767);
 }
 #md-preview strong {
@@ -356,36 +362,36 @@ function hello() {
   text-decoration: underline;
 }
 #md-preview ul, #md-preview ol {
-  padding-left: 24px;
-  margin: 8px 0;
+  padding-left: 28px; /* 列表缩进增加 */
+  margin: 12px 0;
 }
 #md-preview li {
-  margin: 4px 0;
+  margin: 6px 0;      /* 列表项间距增加 */
   color: var(--md-text-secondary, #515767);
 }
 #md-preview blockquote {
-  margin: 12px 0;
-  padding: 12px 16px;
+  margin: 16px 0;
+  padding: 14px 20px; /* 引用块内边距增加 */
   background: var(--md-blockquote-bg, #f7f8fa);
   border-left: 4px solid #1e80ff;
   border-radius: 0 6px 6px 0;
   color: var(--md-text-secondary, #515767);
 }
 #md-preview blockquote p {
-  margin: 4px 0;
+  margin: 6px 0;
   color: inherit;
 }
 #md-preview code {
-  padding: 2px 6px;
+  padding: 3px 8px;
   background: #f2f3f5;
   border-radius: 4px;
   font-family: "SF Mono", "Fira Code", "Consolas", monospace;
-  font-size: 13px;
+  font-size: 14px;    /* 行内代码字体稍微增大 */
   color: #c7254e;
 }
 #md-preview pre {
-  margin: 12px 0;
-  padding: 14px 16px;
+  margin: 16px 0;
+  padding: 16px 20px; /* 代码块内边距增加 */
   background: #f6f8fa;
   border-radius: 8px;
   border: 1px solid #eef0f4;
@@ -396,22 +402,22 @@ function hello() {
   background: none;
   border-radius: 0;
   color: inherit;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 14px;    /* 代码块字体稍微增大 */
+  line-height: 1.8;   /* 代码块行高增加 */
 }
 #md-preview img {
   max-width: 100%;
   border-radius: 8px;
-  margin: 12px 0;
+  margin: 16px 0;
 }
 #md-preview table {
   width: 100%;
   border-collapse: collapse;
-  margin: 12px 0;
+  margin: 16px 0;
   font-size: 14px;
 }
 #md-preview th, #md-preview td {
-  padding: 8px 12px;
+  padding: 10px 16px; /* 表格单元格内边距增加 */
   border: 1px solid #e4e6eb;
   text-align: left;
 }
@@ -422,7 +428,7 @@ function hello() {
 #md-preview hr {
   border: none;
   border-top: 1px solid #e4e6eb;
-  margin: 20px 0;
+  margin: 24px 0;
 }
 #md-preview task-list-item {
   list-style: none;
@@ -433,18 +439,19 @@ function hello() {
   display: none;
 }
 
-/* ===== 状态栏 ===== */
+/* ===== 状态栏：固定在底部 ===== */
 .md-statusbar {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 8px 20px;
+  padding: 8px 24px;
   background: var(--md-toolbar-bg, #fff);
-  border: 1px solid var(--md-border, #e4e6eb);
-  border-top: none;
+  border-top: 1px solid var(--md-border, #e4e6eb);
+  border-bottom: 1px solid var(--md-border, #e4e6eb);
   border-radius: 0 0 12px 12px;
   font-size: 12px;
   color: #8a919f;
+  flex-shrink: 0;     /* 防止被压缩 */
 }
 .md-status-item {
   display: flex;
@@ -488,9 +495,14 @@ body.dark {
   --md-blockquote-bg: #2a2e3a;
 }
 
+body.dark .md-editor-wrap {
+  background: #1f232e;
+}
+
 body.dark .md-toolbar,
 body.dark .md-statusbar {
   border-color: #3a3f4b;
+  background: #262a35;
 }
 body.dark .md-btn {
   background: #2a2e3a;
@@ -566,9 +578,15 @@ body.dark #md-preview hr {
 
 /* ===== 响应式 ===== */
 @media (max-width: 768px) {
+  .md-editor-wrap {
+    height: auto;
+    min-height: 100vh;
+    padding: 0 12px;
+  }
   .md-body {
     flex-direction: column;
     height: auto;
+    min-height: calc(100vh - 120px);
   }
   .md-pane {
     width: 100%;
@@ -592,6 +610,7 @@ body.dark #md-preview hr {
   .md-statusbar {
     flex-wrap: wrap;
     gap: 12px;
+    border-radius: 0;
   }
 }
 </style>
