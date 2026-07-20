@@ -1,6 +1,6 @@
 +++
 title = "Hugo 博客 UI 改造——从扁平到精致的 PaperMod 主题美化实战"
-date = "2026-06-29"
+date = "2026-07-20"
 tags = ["Hugo", "PaperMod", "UI设计", "CSS", "前端美化"]
 categories = ["技术笔记"]
 description = "对 Hugo + PaperMod 博客主题进行全面的 UI/UX 改造，解决层次扁平、留白失控、目录简陋等问题，实现卡片分层、滚动高亮、深色模式优化等精致效果。"
