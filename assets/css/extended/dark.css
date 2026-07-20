@@ -1,26 +1,173 @@
+/* ============================================
+   深色模式 — 护眼深灰黑配色
+   ============================================ */
 :root {
     color-scheme: light;
 }
 
 [data-theme="dark"] {
     color-scheme: dark;
+
+    /* 底色：不用纯黑 #000，深灰黑更护眼 */
+    --bg-page: #0d0d10;
     --surface-1: rgba(255, 255, 255, 0.04);
     --surface-2: rgba(255, 255, 255, 0.06);
-    --line: rgba(255, 255, 255, 0.12);
-    --text-1: #f5efe8;
-    --accent: #fac58b;
-    --accent-soft: rgba(249, 220, 190, 0.16);
+    --surface-card: #17171c;
+    --line: rgba(255, 255, 255, 0.08);
+    --text-1: #e4e7ed;
+    --text-2: #9ca3af;
+    --accent: #73a9ff;
+    --accent-soft: rgba(115, 169, 255, 0.12);
     --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.22);
+    --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] body {
-    background: #121212;
+    background: var(--bg-page);
     color: var(--text-1);
 }
 
-[data-theme="dark"] .post-entry,
-[data-theme="dark"] .toc-container,
+/* 导航栏深色模式 — 半透明磨砂 */
+[data-theme="dark"] .header {
+    background: rgba(13, 13, 16, 0.85);
+}
+
+[data-theme="dark"] .header-nav {
+    background: var(--surface-card);
+    border-color: var(--line);
+}
+
+/* 文章卡片深色模式 */
+[data-theme="dark"] body:not(.list) .post-single {
+    background: var(--surface-card);
+    border-color: var(--line);
+    box-shadow: var(--shadow-card);
+}
+
+/* 面包屑深色 */
+[data-theme="dark"] .breadcrumbs {
+    border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .breadcrumbs a {
+    color: var(--accent);
+}
+
+/* 元信息深色 */
+[data-theme="dark"] .post-meta {
+    background: var(--accent-soft);
+}
+
+/* 正文标题深色 */
+[data-theme="dark"] .post-content h1,
+[data-theme="dark"] .post-content h2,
+[data-theme="dark"] .post-content h3 {
+    color: var(--text-1);
+}
+
+/* 正文段落深色 */
+[data-theme="dark"] .post-content p,
+[data-theme="dark"] .post-content li {
+    color: var(--text-1);
+}
+
+/* 分割线深色 — 渐变 */
+[data-theme="dark"] .post-content hr {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+}
+
+/* 行内代码深色 */
+[data-theme="dark"] .post-content :not(pre) > code {
+    background: rgba(115, 169, 255, 0.12);
+    color: var(--accent);
+}
+
+/* 表格深色 */
+[data-theme="dark"] .post-content table {
+    background: var(--surface-1);
+}
+
+[data-theme="dark"] .post-content th,
+[data-theme="dark"] .post-content td {
+    border-color: var(--line);
+}
+
+[data-theme="dark"] .post-content th {
+    background: rgba(115, 169, 255, 0.08);
+    color: var(--accent);
+}
+
+/* 标签深色 */
+[data-theme="dark"] .post-tags a {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: none;
+}
+
+[data-theme="dark"] .post-tags a:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* 文章列表卡片深色 */
+[data-theme="dark"] .post-entry {
+    background: var(--surface-card);
+    border-color: var(--line);
+}
+
+[data-theme="dark"] .post-entry:hover {
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+    border-color: rgba(115, 169, 255, 0.3);
+}
+
+/* 目录容器深色 */
+[data-theme="dark"] .toc-container {
+    background: var(--surface-card);
+    border-color: var(--line);
+    box-shadow: var(--shadow-card);
+}
+
+/* 目录链接深色 */
+[data-theme="dark"] .toc-container #TableOfContents a {
+    color: var(--text-1);
+}
+
+[data-theme="dark"] .toc-container #TableOfContents a:hover {
+    color: var(--accent);
+}
+
+[data-theme="dark"] .toc-container #TableOfContents li.active a {
+    color: var(--accent);
+}
+
+/* 引用块深色 */
 [data-theme="dark"] blockquote {
     background: var(--surface-1);
+    border-color: var(--line);
+}
+
+/* 分页导航深色 */
+[data-theme="dark"] .paginav {
+    background: var(--surface-1);
+    border-color: var(--line);
+}
+
+[data-theme="dark"] .paginav a {
+    background: var(--surface-1);
+}
+
+[data-theme="dark"] .paginav a:hover {
+    background: var(--surface-2);
+}
+
+/* 搜索页深色 */
+[data-theme="dark"] .search-input {
+    background: var(--surface-1);
+    border-color: var(--line);
+    color: var(--text-1);
+}
+
+/* 归档页深色 */
+[data-theme="dark"] .archive-item {
     border-color: var(--line);
 }

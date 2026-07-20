@@ -11,4 +11,36 @@
         </div>
     </details>
 </div>
+<script>
+(function () {
+    // 滚动监听：自动高亮当前章节对应的目录项
+    var tocLinks = document.querySelectorAll('.toc-container #TableOfContents a');
+    var headings = [];
+    tocLinks.forEach(function (link) {
+        var id = link.getAttribute('href');
+        if (id && id.startsWith('#')) {
+            var target = document.getElementById(id.substring(1));
+            if (target) headings.push({ el: target, link: link });
+        }
+    });
+
+    function updateActive() {
+        var scrollPos = window.scrollY + 120;
+        var active = null;
+        for (var i = headings.length - 1; i >= 0; i--) {
+            if (headings[i].el.offsetTop <= scrollPos) {
+                active = headings[i];
+                break;
+            }
+        }
+        tocLinks.forEach(function (l) {
+            l.parentElement.classList.remove('active');
+        });
+        if (active) active.link.parentElement.classList.add('active');
+    }
+
+    window.addEventListener('scroll', updateActive, { passive: true });
+    updateActive();
+})();
+</script>
 {{- end }}
