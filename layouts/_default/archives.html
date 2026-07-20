@@ -1,0 +1,43 @@
+{{- define "main" }}
+
+<header class="page-header">
+  <h1>{{ .Title }}</h1>
+  {{- if .Description }}
+  <div class="post-description">{{ .Description }}</div>
+  {{- end }}
+</header>
+
+{{- $pages := where (where site.RegularPages "Type" "in" site.Params.mainSections) "Date.Year" "gt" 2000 }}
+{{- if not .Site.Params.disableArchiveGrouping }}
+  {{- $pagesByYear := $pages.GroupByDate "2006" }}
+  {{- range $pagesByYear }}
+    <div class="archive-year">
+      <h2 class="archive-year-title">{{ .Key }} 年 <span class="archive-count">({{ len .Pages }} 篇)</span></h2>
+      {{- $pagesByMonth := .Pages.GroupByDate "January" }}
+      {{- range $pagesByMonth }}
+        <div class="archive-month">
+          <h3 class="archive-month-title">{{ .Key }}</h3>
+          <ul class="archive-list">
+            {{- range .Pages }}
+              <li class="archive-item">
+                <span class="archive-date">{{ .Date.Format "01-02" }}</span>
+                <a href="{{ .Permalink }}" class="archive-link">{{ .Title }}</a>
+              </li>
+            {{- end }}
+          </ul>
+        </div>
+      {{- end }}
+    </div>
+  {{- end }}
+{{- else }}
+  <ul class="archive-list">
+    {{- range $pages }}
+      <li class="archive-item">
+        <span class="archive-date">{{ .Date.Format "2006-01-02" }}</span>
+        <a href="{{ .Permalink }}" class="archive-link">{{ .Title }}</a>
+      </li>
+    {{- end }}
+  </ul>
+{{- end }}
+
+{{- end }}

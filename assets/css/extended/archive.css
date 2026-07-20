@@ -1,34 +1,102 @@
+/* ============================================
+   归档页面样式
+   ============================================ */
+
+/* 归档年份标题 */
 .archive-year {
-    margin: 1.6rem 0 0.6rem;
-    font-size: 1rem;
-    font-weight: 700;
+    margin-bottom: 2.5rem;
+}
+
+.archive-year-title {
+    font-size: 1.6rem;
+    font-weight: 600;
     color: var(--text-1);
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+}
+
+.archive-count {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-2);
+}
+
+/* 归档月份标题 */
+.archive-month {
+    margin-bottom: 1.5rem;
+}
+
+.archive-month-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-2);
+    margin-bottom: 0.8rem;
+}
+
+/* 归档列表 */
+.archive-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .archive-item {
-    padding: 0.7rem 0;
-    border-bottom: 1px solid var(--line);
-}
-
-.archive-item:last-child {
-    border-bottom: none;
-}
-
-.archive-item a {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
+    align-items: baseline;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                background 0.3s ease;
+    transform: translateX(0);
+}
+
+.archive-item:hover {
+    transform: translateX(6px);
+    background: var(--accent-soft);
+}
+
+.archive-item:hover .archive-link {
+    color: var(--accent, #73a9ff);
+}
+
+.archive-item:hover .archive-date {
+    color: #c0c6d0;
+}
+
+.archive-date {
+    font-size: 0.85rem;
+    color: var(--text-2);
+    min-width: 3.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    transition: color 0.35s ease;
+}
+
+.archive-link {
     color: var(--text-1);
     text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.35s ease;
 }
 
-.archive-item a:hover {
-    color: var(--accent);
-}
+/* 响应式 */
+@media screen and (max-width: 768px) {
+    .archive-year-title {
+        font-size: 1.3rem;
+    }
 
-.archive-item .archive-date {
-    color: var(--text-2);
-    font-size: 0.9rem;
-    white-space: nowrap;
+    .archive-month-title {
+        font-size: 1rem;
+    }
+
+    .archive-item {
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .archive-date {
+        min-width: auto;
+    }
 }
